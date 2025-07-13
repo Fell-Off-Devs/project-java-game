@@ -40,10 +40,7 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread.start();
     }
 
-    /*
-    // Sleep method (good, but not recommended)
-    @Override
-    public void run() {
+    public void runSleepMode() {
         double drawInterval = 1000000000 / fps; // 1 billion nano seconds / 60 fps = 0.16666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
         while (gameThread != null) {
@@ -68,11 +65,8 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
-    */
 
-    // Delta method (recommended)
-    @Override
-    public void run() {
+    public void runDeltaMode() {
         double drawInterval = 1000000000 / fps; // 1 billion nano seconds / 60 fps = 0.16666 seconds
         double delta = 0;
         long lastTime = System.nanoTime();
@@ -84,35 +78,47 @@ public class GamePanel extends JPanel implements Runnable {
             currentTime = System.nanoTime();
 
             delta += (currentTime - lastTime) / drawInterval;
-            timer += (currentTime - lastTime);
+            if (Config.DEBUG) {
+                timer += (currentTime - lastTime);
+            }
             lastTime = currentTime;
 
             if (delta >= 1) {
                 update();
                 repaint();
                 delta--;
-                drawCount++;
+                if (Config.DEBUG) {
+                    drawCount++;
+                }
             }
 
-            if (timer > 1000000000) { // 1 second
-                System.out.println("FPS: " + drawCount);
-                drawCount = 0;
-                timer = 0;
+            if (Config.DEBUG) {
+                if (timer > 1000000000) { // 1 second
+                    System.out.println("FPS: " + drawCount);
+                    drawCount = 0;
+                    timer = 0;
+                }
             }
+        }
+    }
+
+    @Override
+    public void run() {
+        if (Config.TIME_SYSTEM == Config.TIME_DELTA) {
+            runDeltaMode();
+        } else {
+            runSleepMode();
         }
     }
 
     public void update() {
         if (keyH.upPressed == true) {
             playerY -= playerSpeed;
-        }
-        else if (keyH.downPressed == true) {
+        } else if (keyH.downPressed == true) {
             playerY += playerSpeed;
-        }
-        else if (keyH.leftPressed == true) {
+        } else if (keyH.leftPressed == true) {
             playerX -= playerSpeed;
-        }
-        else if (keyH.rightPressed == true) {
+        } else if (keyH.rightPressed == true) {
             playerX += playerSpeed;
         }
     }
