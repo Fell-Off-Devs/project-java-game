@@ -1,0 +1,52 @@
+name: Build Java Game
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build
+        run: make
+
+      - name: Send build failure notification to Discord
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                 \"embeds\": [ {
+                   \"title\": \"CI Build Failure\",
+                   \"description\": \"CI has failed build.\",
+                   \"color\": 16711680,
+                   \"fields\": [
+                     {
+                       \"name\": \"Commit:\",
+                       \"value\": \"[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\",
+                       \"inline\": false
+                     },
+                     {
+                       \"name\": \"Author:\",
+                       \"value\": \"[${{ github.actor }}](https://github.com/${{ github.actor }})\",
+                       \"inline\": false
+                     },
+                     {
+                       \"name\": \"Workflow:\",
+                       \"value\": \"[View workflow](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\",
+                       \"inline\": false
+                     }
+                   ]
+                 }]
+               }" \
+               ${{ secrets.DISCORD_BUILD_SECRET }}
