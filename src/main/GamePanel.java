@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable {
     // Screen settings
-    final int originalTileSize = 16; // 16x16 tile
+    final int originalTileSize = 16; // 16x16 tile switch to 32x32 in future
     final int scale = 3;
 
     final int tileSize = originalTileSize * scale; // 48x48 tile
@@ -23,7 +23,7 @@ public class GamePanel extends JPanel implements Runnable {
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
 
-    int playerX = 100;
+    int playerX = 100;      //part wont be necessary in the future 
     int playerY = 100;
     int playerSpeed = 4;
 
